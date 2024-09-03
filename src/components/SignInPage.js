@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 import { auth } from '../firebase';
 import { AuthContext } from '../utility/AuthContext';
 import validation from '../utility/Validation';
@@ -102,6 +102,34 @@ const SignInPage = () => {
     logIn(email.current.value, password.current.value);
   }
 
+
+const googleHandler = () => {
+ 
+  const provider = new GoogleAuthProvider();
+
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      // The signed-in user info.
+      const user = result.user;
+
+      // Update the user context with the signed-in user.
+      setUser(user);
+
+      console.log("Google sign-in successful:", user);
+    })
+    .catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+
+      // Optionally, display a user-friendly error message
+      setErrorMessage(`Google sign-in failed: ${errorMessage}`);
+
+      console.log("Google sign-in error:", errorCode, errorMessage);
+    });
+
+}
+
   return (
     <div className=' max-w-[28rem]  mx-auto mt-16 border border-black  '>
 
@@ -128,16 +156,15 @@ const SignInPage = () => {
 
           <button onClick={submitHandler} className=' text-white text-lg px-4 py-2  bg-black rounded-md font-semibold '>{isSignIn ? ("Sign In") : ("Sign Up")}</button>
 
-        </form>
+          <h1 className=' mx-auto font-semibold text-xl'>OR</h1>
+          {/* <h1 className='text-center'>using</h1> */}
+          <div className=' flex justify-center '><button onClick={ () => { googleHandler() }}> <img className='w-[2rem]' src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png' alt='logo' /></button> </div>
 
+        </form>
+    
         <h1><Link to={"/forget-password"}><button className='mt-2 hover:text-violet-800'>Forget Password ?</button></Link></h1>
 
         <h2 className='mt-2 '>{isSignIn && ("Don't Have An Account. ")}<button className=' hover:border-b border-black' onClick={() => { setIsSignIn(!isSignIn) }}>{isSignIn ? ("Sign Up") : ("Sign In?")}</button></h2>
-
-
-
-         {user && (<h1>user is valid</h1>)}
-         {user && (<h1>{user.displayName}</h1>)}
          
       </section>
 
